@@ -4,15 +4,14 @@
             [com.phronemophobic.llama.raw :as raw]
             [com.phronemophobic.llama.util :as llutil]
             [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [tech.v3.datatype.functional :as fun]
+            [tech.v3.datatype.argops :as argops]))
 
 ;; copied from the original llamma.clj tutorials
 
-(def llama7b-path "/workspace/models/llama-2-7b-chat.ggmlv3.q4_0.bin")
-(def llama-context (llama/create-context llama7b-path {}))
-
-(mapv #(raw/llama_token_to_str llama-context %)
-      tokens)
+(defonce llama7b-path "/workspace/models/llama-2-7b-chat.ggmlv3.q4_0.bin")
+(defonce llama-context (llama/create-context llama7b-path {}))
 
 (def token->str
   (into (sorted-map)
@@ -46,3 +45,8 @@
   (reset! previous* s)
 
   (into [] (llama/get-logits ctx)))
+
+(->> "Clojure is a"
+     (get-logits llama-context)
+     argops/argmax
+     token->str)
